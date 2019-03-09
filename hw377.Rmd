@@ -1,0 +1,108 @@
+---
+title: "hw3"
+output: pdf_document
+---
+
+```{r}
+#Question 1
+mu <- read.table("maybe_uniform.txt", header = FALSE)
+c1 <- c(mu$V1,mu$V2,mu$V3,mu$V4,mu$V5)
+hist(c1)
+
+```
+
+```{r}
+ks.test(c1,"punif")
+```
+
+```{r}
+x <- seq(0, 1, by = 0.0001)
+fx <- ifelse(x >0 & x <= 1/2, 2/3,
+ifelse(x >1/2 & x < 1, 1/2, 0))
+
+plot(x, fx)
+```
+
+```{r}
+ks.test(mu,x)
+```
+
+According to the ks.test result, the p-value is larger than 0.05 which means data is uniformly distributed. Since D-value for fx is also bigger, which means Uniform would be better.
+
+```{r}
+#Question 2
+table2 <- read.table("maybe_normal.txt")
+c2 <- c(table2$V1,table2$V2,table2$V3,table2$V4,table2$V5)
+
+set.seed(2000)
+n1 <- rnorm(50, mean = 26, sd = 2)
+qqplot(c2,n1)
+hist(c2)
+hist(n1)
+
+ks.test(c2,n1)
+```
+The data might generate by normal distribution, base on the result.
+
+```{r}
+#Question 3
+
+same1 <- read.table("maybe_same_1.txt")
+same2 <- read.table("maybe_same_2.txt")
+s1 <- c(same1$V1,same1$V2,same1$V3,same1$V4,same1$V5)
+s2 <- c(same2$V1,same2$V2,same2$V3,same2$V4)
+ks.test(s1, s2)
+```
+
+```{r}
+ks.test(s1+2,s2)
+```
+
+For ks.test(s1,s2), p-value is bigger than 0.05, fail to reject null hypothesis. s1,s2 from same distribution. For ks.test(s1+2,s2), p-value is very small, reject null hypothesis: s1+2,s2 not from same distribution.
+
+```{r}
+rds1 <- readRDS("norm_sample.Rdata")
+ecdf1 <- ecdf(rds1)
+plot(ecdf1)
+```
+
+```{r}
+a <- rnorm(25,0,1)
+ks.test(rds1,a)
+
+```
+
+```{r}
+dfns <- as.data.frame(rds1)
+dfns$dif <- abs(ecdf1(rds1) - pnorm(rds1))
+dstat <- max(dfns$dif)
+
+dstat
+
+ks.test(rds1,"pnorm")
+
+```
+
+```{r}
+# Question 5
+fijiquakes <- read.table("fijiquakes(1).dat", header = TRUE)
+faithful <- read.table("faithful(1).dat", header = TRUE, skip = 20)
+
+library(sfsmisc)
+ecdf.ksCI(fijiquakes$mag)
+ecdf.ksCI(faithful$waiting)
+
+```
+
+```{r}
+amount <- sum( (fijiquakes$mag <= 4.9) & (fijiquakes$mag > 4.3))
+library(Hmisc)
+binconf(amount, alpha = 0.05, length(fijiquakes$mag), method=c("wilson","exact","asymptotic","all"))
+
+mean(faithful$waiting)
+median(faithful$waiting)
+
+
+```
+
+
